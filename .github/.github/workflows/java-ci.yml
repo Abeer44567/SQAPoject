@@ -1,4 +1,4 @@
-name: Java CI (No Build Tool)
+name: Java CI with JUnit
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-run:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,8 +23,14 @@ jobs:
     - name: Compile Java files
       run: |
         mkdir -p bin
-        javac -d bin src/*.java
+        javac -d bin -cp ".:junit-4.13.2.jar:hamcrest-core-1.3.jar" src/comm/*.java
 
-    - name: Run Main class
+    - name: Download JUnit 4 jars
       run: |
-        java -cp bin Main
+        wget -O junit-4.13.2.jar https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
+        wget -O hamcrest-core-1.3.jar https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+
+    - name: Run Tests
+      run: |
+        java -cp "bin:junit-4.13.2.jar:hamcrest-core-1.3.jar" org.junit.runner.JUnitCore comm.LoginServiceTest
+
